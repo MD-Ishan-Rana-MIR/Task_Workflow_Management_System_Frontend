@@ -1,9 +1,9 @@
-import Registration from './components/auth/Registration'
+import LoginFrom from "./components/auth/LoginFrom"
 
 const page = () => {
   return (
     <div>
-      <Registration/>
+      <LoginFrom/>
     </div>
   )
 }
