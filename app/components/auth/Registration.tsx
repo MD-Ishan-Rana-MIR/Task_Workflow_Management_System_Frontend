@@ -1,30 +1,50 @@
 "use client"
+
+import { useState } from "react"
 import { useForm, type SubmitHandler } from "react-hook-form"
+import Link from "next/link"
+import { useRouter } from "next/navigation"
+import { Eye, EyeOff } from "lucide-react"
+import { toast } from "sonner"
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
-import Link from "next/link"
+import { Spinner } from "@/components/ui/spinner"
+
+import { useRegistrationMutation } from "@/app/api/auth/authApi"
+import { errorMessage } from "@/app/utility/msg/errorMsg"
 
 type SignUpFormData = {
   name: string
   email: string
   password: string
-  confirm_password: string
 }
 
 export default function Registration() {
   const {
     register,
     handleSubmit,
-    watch,
+    reset,
     formState: { errors },
   } = useForm<SignUpFormData>()
 
-  const password = watch("password")
+  const router = useRouter()
+  const [showPassword, setShowPassword] = useState(false)
 
-  const onSubmit: SubmitHandler<SignUpFormData> = (data) => {
-    console.log("Sign Up Data:", data)
+  const [registration, { isLoading }] = useRegistrationMutation()
+
+  const onSubmit: SubmitHandler<SignUpFormData> = async (data) => {
+    try {
+      const res = await registration(data).unwrap()
+
+      toast.success(res?.message || "Registration successful")
+      reset()
+      router.push("/login")
+    } catch (error) {
+      errorMessage(error)
+    }
   }
 
   return (
@@ -78,18 +98,30 @@ export default function Registration() {
             {/* Password */}
             <div className="space-y-2">
               <Label htmlFor="password">Password</Label>
-              <Input
-                id="password"
-                type="password"
-                placeholder="••••••••"
-                {...register("password", {
-                  required: "Password is required",
-                  minLength: {
-                    value: 6,
-                    message: "Password must be at least 6 characters",
-                  },
-                })}
-              />
+
+              <div className="relative">
+                <Input
+                  id="password"
+                  type={showPassword ? "text" : "password"}
+                  placeholder="••••••••"
+                  {...register("password", {
+                    required: "Password is required",
+                    minLength: {
+                      value: 6,
+                      message: "Password must be at least 6 characters",
+                    },
+                  })}
+                />
+
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                >
+                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              </div>
+
               {errors.password && (
                 <p className="text-sm text-red-500">
                   {errors.password.message}
@@ -97,29 +129,15 @@ export default function Registration() {
               )}
             </div>
 
-            {/* Confirm Password */}
-            <div className="space-y-2">
-              <Label htmlFor="confirm_password">Confirm Password</Label>
-              <Input
-                id="confirm_password"
-                type="password"
-                placeholder="••••••••"
-                {...register("confirm_password", {
-                  required: "Confirm password is required",
-                  validate: (value) =>
-                    value === password || "Passwords do not match",
-                })}
-              />
-              {errors.confirm_password && (
-                <p className="text-sm text-red-500">
-                  {errors.confirm_password.message}
-                </p>
+            {/* Submit Button */}
+            <Button type="submit" className="w-full" disabled={isLoading}>
+              {isLoading ? (
+                <div className="flex justify-center items-center">
+                  <Spinner />
+                </div>
+              ) : (
+                "Sign Up"
               )}
-            </div>
-
-            {/* Submit */}
-            <Button type="submit" className="w-full">
-              Sign Up
             </Button>
           </form>
 
