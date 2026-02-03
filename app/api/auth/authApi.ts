@@ -11,11 +11,20 @@ export const authApi = baseApi.injectEndpoints({
             body : data
         }),
         invalidatesTags : ["User"]
+    }),
+    login : builder.mutation({
+        query : (data)=>({
+            url : `/auth/login`,
+            method : "POST",
+            body : data
+        }),
+        invalidatesTags : ["User"]
     })
   }),
 })
 
 export const {
-    useRegistrationMutation
+    useRegistrationMutation,
+    useLoginMutation
   
 } = authApi

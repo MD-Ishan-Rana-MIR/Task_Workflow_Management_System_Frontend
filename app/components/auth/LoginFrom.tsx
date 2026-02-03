@@ -9,6 +9,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
+import { useLoginMutation } from "@/app/api/auth/authApi"
+import { errorMessage } from "@/app/utility/msg/errorMsg"
+import { toast } from "sonner"
+import { Spinner } from "@/components/ui/spinner"
+import { useRouter } from "next/navigation"
 
 type LoginFormData = {
   email: string
@@ -19,15 +24,39 @@ export default function LoginForm() {
   const {
     register,
     handleSubmit,
+    reset,
     formState: { errors },
   } = useForm<LoginFormData>()
 
-  const [showPassword, setShowPassword] = useState(false)
+  const [showPassword, setShowPassword] = useState(false);
 
-  const onSubmit: SubmitHandler<LoginFormData> = (data) => {
-    console.log("Login Data:", data)
-    // call login API here
+  const [login,{isLoading}] = useLoginMutation();
+  const router = useRouter();
+const onSubmit: SubmitHandler<LoginFormData> = async (data) => {
+  console.log("Login Data:", data)
+  try {
+    const res = await login(data).unwrap()
+
+    if (res) {
+      // Save token to localStorage
+      if (res?.data?.token) {
+        localStorage.setItem("token", res.data.token)
+      }
+
+      // Show success toast
+      toast.success(res?.message || "Login successful")
+
+      // Redirect based on role
+      if (res?.data?.role === "member") {
+        router.push("/")
+      } else {
+        router.push("/admin")
+      }
+    }
+  } catch (error) {
+    errorMessage(error)
   }
+}
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4">
@@ -98,7 +127,9 @@ export default function LoginForm() {
 
             {/* Submit */}
             <Button type="submit" className="w-full">
-              Login
+              {
+                isLoading ? <div className=" flex justify-center items-center" > <Spinner></Spinner> </div> : "Login"
+              }
             </Button>
           </form>
 
