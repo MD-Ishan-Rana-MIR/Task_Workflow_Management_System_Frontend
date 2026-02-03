@@ -4,15 +4,15 @@ import { baseApi } from "../baseApi/baseApi";
 export const projectsApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     // 1️⃣ Get all projects
-    getProjects: builder.query<any[], void>({
-      query: () => "/projects",
+    getProjects: builder.query({
+      query: () => "/all-project",
       providesTags: ["Project"]
     }),
 
     // 2️⃣ Create project
-    createProject: builder.mutation<any, any>({
+    createProject: builder.mutation({
       query: (body) => ({
-        url: "/projects",
+        url: "/create-project",
         method: "POST",
         body
       }),
@@ -20,7 +20,7 @@ export const projectsApi = baseApi.injectEndpoints({
     }),
 
     // 3️⃣ Update project
-    updateProject: builder.mutation<any, { id: string; data: any }>({
+    updateProject: builder.mutation({
       query: ({ id, data }) => ({
         url: `/projects/${id}`,
         method: "PATCH",
@@ -30,7 +30,7 @@ export const projectsApi = baseApi.injectEndpoints({
     }),
 
     // 4️⃣ Delete project
-    deleteProject: builder.mutation<any, string>({
+    deleteProject: builder.mutation({
       query: (id) => ({
         url: `/projects/${id}`,
         method: "DELETE"
