@@ -13,10 +13,10 @@ import AdminNavbar from "@/app/components/admin/AdminNavbar";
 
 const MainLayout = ({ children }: { children: React.ReactNode }) => {
     const [sidebarOpen, setSidebarOpen] = useState(true);
-    const  pathname  = usePathname();
-    const handleLogout  = async()=>{
+    const pathname = usePathname();
+    const handleLogout = async () => {
         const res = await logoutAlert();
-        if(res.isConfirmed){
+        if (res.isConfirmed) {
             localStorage.clear();
             window.location.href = "/";
         }
@@ -50,7 +50,7 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
                 {/* Menu */}
                 <nav>
                     <ul className="space-y-3 text-lg font-medium">
-                        
+
                         <li>
                             <Link
                                 href="/admin"
@@ -76,6 +76,35 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
                                             }`}
                                     >
                                         User Management
+                                    </span>
+                                )}
+                            </Link>
+                        </li>
+                        <li>
+                            <Link
+                                href="/admin/project"
+                                className={`flex items-center gap-5 px-5 py-3 rounded-full transition    ${pathname === "/admin/project"
+                                    ? "bg-[#E9E9E9]"
+                                    : "hover:bg-gray-100"
+                                    }`}
+                            >
+                                <FaProjectDiagram
+                                    size={25}
+                                    className={
+                                        pathname === "/admin/project"
+                                            ? "text-indigo-600"
+                                            : "text-[#989898]"
+                                    }
+                                />
+
+                                {sidebarOpen && (
+                                    <span
+                                        className={`text-base ${pathname === "/admin/project"
+                                            ? "text-indigo-600"
+                                            : "text-[#989898]"
+                                            }`}
+                                    >
+                                        Project
                                     </span>
                                 )}
                             </Link>
@@ -115,7 +144,7 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
                 {/* Logout */}
                 <div className="absolute bottom-8 left-0 w-full px-6">
                     <button
-                    onClick={handleLogout}
+                        onClick={handleLogout}
                         className="w-full cursor-pointer py-2 rounded-full border border-gray-300 text-[#989898] hover:text-indigo-600 hover:border-text-indigo-600 transition"
                     >
                         Logout

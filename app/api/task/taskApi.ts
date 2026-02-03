@@ -4,31 +4,31 @@ import { baseApi } from "../baseApi/baseApi";
 export const taskApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     // 1️⃣ Get all tasks
-    getTasks: builder.query<any[], void>({
+    getTasks: builder.query({
       query: () => "/all-task",
       providesTags: ["Task"]
     }),
 
     // 2️⃣ Create new task
-    createTask: builder.mutation<any, any>({
-      query: (body) => ({
-        url: "/tasks",
-        method: "POST",
-        body
+    createTask: builder.mutation
+      ({
+        query: (body) => ({
+          url: "/tasks",
+          method: "POST",
+          body
+        }),
+        invalidatesTags: ["Task"]
       }),
-      invalidatesTags: ["Task"]
-    }),
 
-    // 3️⃣ Change task stage
-    changeStage: builder.mutation<any, { taskId: string; nextStageId: string }>({
-      query: ({ taskId, nextStageId }) => ({
+
+    updateTaskStage: builder.mutation({
+      query: ({ taskId, stageId }) => ({
         url: `/task-stage-change/${taskId}/stage`,
         method: "PUT",
-        body: { nextStageId }
-      }),
-      invalidatesTags: ["Task"]
+        body: { nextStageId: stageId }
+      })
     })
   })
 });
 
-export const { useGetTasksQuery, useCreateTaskMutation, useChangeStageMutation } = taskApi;
+export const { useGetTasksQuery, useCreateTaskMutation, useUpdateTaskStageMutation } = taskApi;
